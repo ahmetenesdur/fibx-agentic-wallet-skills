@@ -16,6 +16,14 @@ allowed-tools:
 
 Use this skill to inspect the wallet's holdings. By default, it checks the Base network, but can be directed to others.
 
+## Hard Rules (CRITICAL)
+
+1.  **Chain Specification**:
+    - If the user mentions a specific chain (e.g., "on Monad", "for my Citrea wallet"), you **MUST** include the `--chain <name>` parameter.
+    - If the user **DOES NOT** mention a chain, you **MUST** either:
+        - Explicitly state the default: "I will check your balance on **Base**. Is that correct?"
+        - OR ask for clarification: "Which chain would you like to check? Base, Citrea, HyperEVM, or Monad?"
+
 ## usage
 
 ```bash

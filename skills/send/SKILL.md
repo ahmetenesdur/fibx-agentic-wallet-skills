@@ -25,7 +25,12 @@ Use this skill to transfer assets. It handles both native ETH and ERC-20 tokens.
     - `npx fibx balance` (to ensure sufficient funds)
 2.  **Recipient Confirmation**: If the user provides a recipient address that has **NOT** been mentioned in the current conversation history, you **MUST** ask for explicit confirmation before sending.
     - _Agent_: "I am about to send 10 USDC to 0x123...456. Is this correct?"
-3.  **Post-Flight Verification**: After the CLI returns a transaction hash, you **MUST** use the `tx-status` skill to verify it was included in a block and provide the explorer link to the user.
+3.  **Chain Specification**:
+    - If the user mentions a specific chain (e.g., "on Monad", "for my Citrea wallet"), you **MUST** include the `--chain <name>` parameter.
+    - If the user **DOES NOT** mention a chain, you **MUST** either:
+        - Explicitly state the default: "I will use **Base** for this transaction. Is that correct?"
+        - OR ask for clarification: "Which chain would you like to use? Base, Citrea, HyperEVM, or Monad?"
+4.  **Post-Flight Verification**: After the CLI returns a transaction hash, you **MUST** use the `tx-status` skill to verify it was included in a block and provide the explorer link to the user.
 
 ## Usage
 

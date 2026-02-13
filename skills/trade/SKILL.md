@@ -23,10 +23,15 @@ Use this skill to exchange one token for another. It uses the Fibrous Finance ag
 1.  **Pre-Flight Check**: Before ANY trade, you **MUST** run:
     - `npx fibx status`
     - `npx fibx balance` (ensure you have the _source_ token)
-2.  **Slippage Safety**: The default slippage is **0.5%**. If you need to change this (e.g., for volatile tokens), you **MUST** ask the user for confirmation first.
-3.  **Approval Limits**: The CLI defaults to "Exact Approval" (approves only the amount to be swapped).
+2.  **Chain Specification**:
+    - If the user mentions a specific chain (e.g., "on Monad", "for my Citrea wallet"), you **MUST** include the `--chain <name>` parameter.
+    - If the user **DOES NOT** mention a chain, you **MUST** either:
+        - Explicitly state the default: "I will perform this trade on **Base**. Is that correct?"
+        - OR ask for clarification: "Which chain would you like to trade on? Base, Citrea, HyperEVM, or Monad?"
+3.  **Slippage Safety**: The default slippage is **0.5%**. If you need to change this (e.g., for volatile tokens), you **MUST** ask the user for confirmation first.
+4.  **Approval Limits**: The CLI defaults to "Exact Approval" (approves only the amount to be swapped).
     - Do **NOT** use `--approve-max` unless the user explicitly requests "infinite approval" or "max approval".
-4.  **Simulation & Verification**: The CLI performs a route check before swapping. If this fails, do not proceed. After swapping, verify the transaction with the `tx-status` skill.
+5.  **Simulation & Verification**: The CLI performs a route check before swapping. If this fails, do not proceed. After swapping, verify the transaction with the `tx-status` skill.
 
 ## Usage
 
