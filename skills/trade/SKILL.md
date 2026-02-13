@@ -3,7 +3,7 @@ name: trade
 description: Swap or trade tokens on Base network. Use when you or the user want to trade, swap, exchange, buy, sell, or convert between tokens like USDC, ETH, and WETH. Covers phrases like "buy ETH", "sell ETH for USDC", "convert USDC to ETH".
 user-invocable: true
 disable-model-invocation: false
-allowed-tools: ["Bash(fibx status*)", "Bash(fibx trade *)", "Bash(fibx balance*)"]
+allowed-tools: ["Bash(npx fibx status*)", "Bash(npx fibx trade *)", "Bash(npx fibx balance*)"]
 ---
 
 # Trading Tokens
@@ -13,7 +13,7 @@ Use the `fibx trade` command to swap tokens on Base network via Fibrous. You mus
 ## Confirm wallet is initialized and authed
 
 ```bash
-fibx status
+npx fibx status
 ```
 
 If the wallet is not authenticated, refer to the `authenticate-wallet` skill.
@@ -21,7 +21,7 @@ If the wallet is not authenticated, refer to the `authenticate-wallet` skill.
 ## Command Syntax
 
 ```bash
-fibx trade <amount> <from> <to> [options]
+npx fibx trade <amount> <from> <to> [options]
 ```
 
 ## Arguments
@@ -43,16 +43,16 @@ fibx trade <amount> <from> <to> [options]
 
 ```bash
 # Swap 1 ETH for USDC
-fibx trade 1 ETH USDC
+npx fibx trade 1 ETH USDC
 
 # Swap $10 USDC for ETH (assumes 1 USDC = $1)
-fibx trade '$10' USDC ETH
+npx fibx trade '$10' USDC ETH
 
 # Swap with custom slippage (1%)
-fibx trade 1 ETH USDC --slippage 1
+npx fibx trade 1 ETH USDC --slippage 1
 
 # Get JSON output
-fibx trade 1 ETH USDC --json
+npx fibx trade 1 ETH USDC --json
 ```
 
 ## Prerequisites

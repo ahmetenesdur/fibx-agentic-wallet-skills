@@ -3,7 +3,7 @@ name: send
 description: Send ETH or ERC20 tokens (like USDC) to an Ethereum address. Use when you or the user want to send money, pay someone, transfer funds, tip, donate, or send to a wallet address. Covers phrases like "send $5", "send ETH", "transfer USDC".
 user-invocable: true
 disable-model-invocation: false
-allowed-tools: ["Bash(fibx status*)", "Bash(fibx send *)", "Bash(fibx balance*)"]
+allowed-tools: ["Bash(npx fibx status*)", "Bash(npx fibx send *)", "Bash(npx fibx balance*)"]
 ---
 
 # Sending Funds
@@ -13,7 +13,7 @@ Use the `fibx send` command to transfer ETH or ERC20 tokens from the wallet to a
 ## Confirm wallet is initialized and authed
 
 ```bash
-fibx status
+npx fibx status
 ```
 
 If the wallet is not authenticated, refer to the `authenticate-wallet` skill.
@@ -21,7 +21,7 @@ If the wallet is not authenticated, refer to the `authenticate-wallet` skill.
 ## Command Syntax
 
 ```bash
-fibx send <amount> <recipient> [token] [--json]
+npx fibx send <amount> <recipient> [token] [--json]
 ```
 
 ## Arguments
@@ -42,16 +42,16 @@ fibx send <amount> <recipient> [token] [--json]
 
 ```bash
 # Send 1 ETH (default token is ETH)
-fibx send 1 0x1234...abcd
+npx fibx send 1 0x1234...abcd
 
 # Send 50 USDC
-fibx send 50 0x1234...abcd USDC
+npx fibx send 50 0x1234...abcd USDC
 
 # Send $1.00 USDC (assumes 1 USDC = $1)
-fibx send '$1.00' 0x1234...abcd USDC
+npx fibx send '$1.00' 0x1234...abcd USDC
 
 # Get JSON output
-fibx send 0.1 0x1234...abcd ETH --json
+npx fibx send 0.1 0x1234...abcd ETH --json
 ```
 
 ## Prerequisites

@@ -3,7 +3,7 @@ name: balance
 description: Check wallet balance. Use when you or the user want to see funds, check ETH or token holdings.
 user-invocable: true
 disable-model-invocation: false
-allowed-tools: ["Bash(fibx status*)", "Bash(fibx balance*)"]
+allowed-tools: ["Bash(npx fibx status*)", "Bash(npx fibx balance*)"]
 ---
 
 # Checking Balance
@@ -13,15 +13,15 @@ Use the `fibx balance` command to check current holdings.
 ## Usage
 
 ```bash
-fibx balance [--json]
+npx fibx balance [--json]
 ```
 
 ## Examples
 
 ```bash
 # Check balance
-fibx balance
+npx fibx balance
 
 # Check balance as JSON
-fibx balance --json
+npx fibx balance --json
 ```

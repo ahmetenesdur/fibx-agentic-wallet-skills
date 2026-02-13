@@ -13,11 +13,11 @@
 
 ## Installation
 
-These skills are designed to be used with an agentic framework that can execute shell commands. Ensure the `fibx` CLI is installed and available in the environment.
+To use these skills with an agent framework:
 
-1.  **Install `fibx` CLI**:
-    Follow the instructions in the [main README](../README.md) to install and configure `fibx`.
-    Ensure you can run `pnpm dev` or `fibx` (if aliased) from the command line.
+1.  **Dependencies**:
+    You do NOT need to install `fibx` manually. The skills are configured to use `npx fibx`, which will automatically download and run the CLI.
+    - **Requirement**: `node` and `npm` must be available in the agent's environment.
 
 2.  **Add Skills**:
     Import the skills from the `./skills` directory into your agent's skill registry.
