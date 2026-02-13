@@ -34,19 +34,20 @@ npx fibx trade <amount> <from> <to> [options]
 
 ## Options
 
-| Option           | Description                            |
-| ---------------- | -------------------------------------- |
-| `--slippage <n>` | Slippage tolerance percent (e.g., 0.5) |
-| `--json`         | Output result as JSON                  |
+| Option              | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| `--chain <network>` | Specify network: `base`, `citrea`, `hyperevm`, `monad` |
+| `--slippage <n>`    | Slippage tolerance percent (e.g., 0.5)                 |
+| `--json`            | Output result as JSON                                  |
 
 ## Examples
 
 ```bash
-# Swap 0.01 ETH for USDC
+# Swap 0.01 ETH for USDC on Base (default)
 npx fibx trade 0.01 ETH USDC
 
-# Swap $10 USDC for ETH (assumes 1 USDC = $1)
-npx fibx trade '$10' USDC ETH
+# Swap on Monad
+npx fibx trade 1 MON USDC --chain monad
 
 # Swap with custom slippage (1%)
 npx fibx trade 1 ETH USDC --slippage 1

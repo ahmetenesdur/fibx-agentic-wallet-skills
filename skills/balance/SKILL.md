@@ -13,14 +13,24 @@ Use the `fibx balance` command to check current holdings.
 ## Usage
 
 ```bash
-npx fibx balance [--json]
+npx fibx balance [--chain <chain>] [--json]
 ```
+
+## Options
+
+| Option              | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| `--chain <network>` | Specify network: `base`, `citrea`, `hyperevm`, `monad` |
+| `--json`            | Output result as JSON                                  |
 
 ## Examples
 
 ```bash
-# Check balance
+# Check balance on Base (default)
 npx fibx balance
+
+# Check balance on Monad
+npx fibx balance --chain monad
 
 # Check balance as JSON
 npx fibx balance --json

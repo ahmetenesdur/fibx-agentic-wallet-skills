@@ -1,15 +1,15 @@
 # fibx Agentic Wallet Skills
 
-[Agent Skills](https://agentskills.io) for the `fibx` CLI wallet. These skills enable AI agents to authenticate, check balances, send funds, and trade tokens on Base using the [`fibx`](https://www.npmjs.com/package/fibx) CLI.
+[Agent Skills](https://agentskills.io) for the `fibx` CLI wallet. These skills enable AI agents to authenticate, check balances, send funds, and trade tokens on **Base, Citrea, HyperEVM, and Monad** using the [`fibx`](https://www.npmjs.com/package/fibx) CLI.
 
 ## Available Skills
 
 | Skill                                                        | Description                                          |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
 | [authenticate-wallet](./skills/authenticate-wallet/SKILL.md) | Sign in to the wallet via email OTP (2-step process) |
-| [balance](./skills/balance/SKILL.md)                         | Check ETH and token balances on Base                 |
+| [balance](./skills/balance/SKILL.md)                         | Check ETH and token balances on supported chains     |
 | [send](./skills/send/SKILL.md)                               | Send ETH or ERC-20 tokens to another address         |
-| [trade](./skills/trade/SKILL.md)                             | Swap/trade tokens on Base using Fibrous aggregation  |
+| [trade](./skills/trade/SKILL.md)                             | Swap/trade tokens using Fibrous aggregation          |
 
 ## Installation
 

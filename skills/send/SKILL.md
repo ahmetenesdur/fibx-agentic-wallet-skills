@@ -21,7 +21,7 @@ If the wallet is not authenticated, refer to the `authenticate-wallet` skill.
 ## Command Syntax
 
 ```bash
-npx fibx send <amount> <recipient> [token] [--json]
+npx fibx send <amount> <recipient> [token] [--chain <chain>] [--json]
 ```
 
 ## Arguments
@@ -34,9 +34,10 @@ npx fibx send <amount> <recipient> [token] [--json]
 
 ## Options
 
-| Option   | Description           |
-| -------- | --------------------- |
-| `--json` | Output result as JSON |
+| Option              | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| `--chain <network>` | Specify network: `base`, `citrea`, `hyperevm`, `monad` |
+| `--json`            | Output result as JSON                                  |
 
 ## Examples
 
