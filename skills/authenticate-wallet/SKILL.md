@@ -1,87 +1,70 @@
 ---
 name: authenticate-wallet
-description: Sign in to the wallet. Use when you or the user want to log in, sign in, connect, or set up the wallet, or when any wallet operation fails with authentication or "not signed in" errors. This skill is a prerequisite before sending, trading, or funding.
-user-invocable: true
-disable-model-invocation: false
+description: Sign in to the wallet using email OTP. Use this when the user needs to log in, or when other skills fail with "not authenticated" errors.
+license: MIT
+compatibility: Requires Node.js and npx. Works with fibx CLI v0.1.2+.
+metadata:
+    version: 1.0.0
+    author: fibx-team
+    category: detailed-auth
 allowed-tools:
-    [
-        "Bash(npx fibx status*)",
-        "Bash(npx fibx auth *)",
-        "Bash(npx fibx balance*)",
-        "Bash(npx fibx address*)",
-    ]
+    - Bash(npx fibx auth *)
+    - Bash(npx fibx status *)
 ---
 
-# Authenticating with the Wallet
+# Wallet Authentication
 
-When the wallet is not signed in (detected via `fibx status` or when wallet operations fail with authentication errors), use the `fibx` CLI to authenticate.
+This skill manages the authentication session for the `fibx` CLI. It uses a 2-step email OTP process managed by Privy.
 
-**Prerequisites**:
-The following environment variables must be set in the runtime environment:
+## Usage
 
-- `PRIVY_APP_ID`
-- `PRIVY_APP_SECRET`
+### Step 1: Initiate Login
 
-Authentication uses a two-step email OTP process:
-
-## Authentication Flow
-
-### Step 1: Initiate login
+Request an OTP code to be sent to the user's email.
 
 ```bash
 npx fibx auth login <email>
 ```
 
-This sends a 6-digit verification code to the email.
-
 ### Step 2: Verify OTP
+
+Complete the login using the code provided by the user.
 
 ```bash
 npx fibx auth verify <email> <code>
 ```
 
-Use the email from step 1 and the 6-digit code from the user to complete authentication.
+### Check Status
 
-## Checking Authentication Status
-
-```bash
-fibx status
-```
-
-Displays wallet server health and authentication status including wallet address.
-
-## Example Session
+Verify if the wallet is currently authenticated and view the wallet address.
 
 ```bash
-# Check current status
-npx fibx status
-
-# Start login (sends OTP to email)
-npx fibx auth login user@example.com
-
-# After user receives code, verify
-npx fibx auth verify user@example.com 123456
-
-# Confirm authentication
 npx fibx status
 ```
 
-## Available CLI Commands
+## Examples
 
-| Command                               | Purpose                               |
-| ------------------------------------- | ------------------------------------- |
-| `npx fibx status`                     | Check server health and auth status   |
-| `npx fibx auth login <email>`         | Send OTP code to email                |
-| `npx fibx auth verify <email> <code>` | Complete authentication with OTP code |
-| `npx fibx balance`                    | Get wallet balance                    |
-| `npx fibx address`                    | Get wallet address                    |
+### Full Login Flow
 
-## JSON Output
+1.  **Agent**: "I need to log you in. What is your email?"
+2.  **User**: "user@example.com"
+3.  **Agent**: Runs command:
+    ```bash
+    npx fibx auth login user@example.com
+    ```
+4.  **Agent**: "I've sent a code to your email. Please provide it."
+5.  **User**: "123456"
+6.  **Agent**: Runs command:
+    ```bash
+    npx fibx auth verify user@example.com 123456
+    ```
+7.  **Agent**: Validates success:
+    ```bash
+    npx fibx status
+    ```
 
-All commands support `--json` for machine-readable output:
+## Error Handling
 
-```bash
-npx fibx status --json
-npx fibx auth login user@example.com --json
-npx fibx auth verify user@example.com 123456 --json
-```
+- **"Invalid code"**: Ask the user to check the code and try `verify` again.
+- **"Rate limit"**: Wait for a few seconds before retrying.
+- **"Session expired"**: Restart the flow from Step 1.

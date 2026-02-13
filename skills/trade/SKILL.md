@@ -1,69 +1,91 @@
 ---
 name: trade
-description: Swap or trade tokens on Base network. Use when you or the user want to trade, swap, exchange, buy, sell, or convert between tokens like USDC, ETH, and WETH. Covers phrases like "buy ETH", "sell ETH for USDC", "convert USDC to ETH".
-user-invocable: true
-disable-model-invocation: false
-allowed-tools: ["Bash(npx fibx status*)", "Bash(npx fibx trade *)", "Bash(npx fibx balance*)"]
+description: Swap/Trade tokens using Fibrous Finance aggregation. Supports Base, Citrea, HyperEVM, and Monad.
+license: MIT
+compatibility: Requires Node.js and npx. Works with fibx CLI v0.1.2+.
+metadata:
+    version: 1.0.0
+    author: fibx-team
+    category: detailed-transaction
+allowed-tools:
+    - Bash(npx fibx trade *)
+    - Bash(npx fibx status)
+    - Bash(npx fibx balance *)
+    - Bash(npx fibx tx-status *)
 ---
 
-# Trading Tokens
+# Trade / Swap Tokens
 
-Use the `fibx trade` command to swap tokens on Base network via Fibrous. You must be authenticated to trade.
+Use this skill to exchange one token for another. It uses the Fibrous Finance aggregator to find the best route.
 
-## Confirm wallet is initialized and authed
+## Hard Rules (CRITICAL)
+
+1.  **Pre-Flight Check**: Before ANY trade, you **MUST** run:
+    - `npx fibx status`
+    - `npx fibx balance` (ensure you have the _source_ token)
+2.  **Slippage Safety**: The default slippage is **0.5%**. If you need to change this (e.g., for volatile tokens), you **MUST** ask the user for confirmation first.
+3.  **Approval Limits**: The CLI defaults to "Exact Approval" (approves only the amount to be swapped).
+    - Do **NOT** use `--approve-max` unless the user explicitly requests "infinite approval" or "max approval".
+4.  **Simulation & Verification**: The CLI performs a route check before swapping. If this fails, do not proceed. After swapping, verify the transaction with the `tx-status` skill.
+
+## Usage
 
 ```bash
-npx fibx status
+npx fibx trade <amount> <from_token> <to_token> [options]
 ```
 
-If the wallet is not authenticated, refer to the `authenticate-wallet` skill.
+### Arguments
 
-## Command Syntax
+| Argument     | Description                                          |
+| ------------ | ---------------------------------------------------- |
+| `amount`     | Amount to swap (e.g., `1.5`, `100`).                 |
+| `from_token` | Source token symbol (`ETH`, `USDC`) or address.      |
+| `to_token`   | Destination token symbol (`WETH`, `DAI`) or address. |
 
-```bash
-npx fibx trade <amount> <from> <to> [options]
-```
+### Options
 
-## Arguments
-
-| Argument | Description                                    |
-| -------- | ---------------------------------------------- |
-| `amount` | Amount to swap: '$1.00', '1.00', or raw units. |
-| `from`   | Source token symbol (e.g., ETH, USDC)          |
-| `to`     | Destination token symbol (e.g., USDC, WETH)    |
-
-## Options
-
-| Option              | Description                                            |
-| ------------------- | ------------------------------------------------------ |
-| `--chain <network>` | Specify network: `base`, `citrea`, `hyperevm`, `monad` |
-| `--slippage <n>`    | Slippage tolerance percent (e.g., 0.5)                 |
-| `--json`            | Output result as JSON                                  |
+| Option              | Description                                                      |
+| ------------------- | ---------------------------------------------------------------- |
+| `--chain <network>` | Network: `base`, `citrea`, `hyperevm`, `monad`. Default: `base`. |
+| `--slippage <n>`    | Slippage tolerance in percentage (e.g., `1.0`). Default `0.5`.   |
+| `--approve-max`     | Force infinite approval. **Use with caution.**                   |
+| `--json`            | Output result as JSON.                                           |
 
 ## Examples
 
-```bash
-# Swap 0.01 ETH for USDC on Base (default)
-npx fibx trade 0.01 ETH USDC
+### Standard Swap (Base)
 
-# Swap on Monad
-npx fibx trade 1 MON USDC --chain monad
+**User:** "Swap 0.1 ETH for USDC"
 
-# Swap with custom slippage (1%)
-npx fibx trade 1 ETH USDC --slippage 1
+**Agent Actions:**
 
-# Get JSON output
-npx fibx trade 1 ETH USDC --json
-```
+1.  `npx fibx status`
+2.  `npx fibx balance`
+3.  `npx fibx trade 0.1 ETH USDC`
+4.  `npx fibx tx-status <hash>`
 
-## Prerequisites
+### Swap with Custom Slippage
 
-- Must be authenticated (`fibx status` to check)
-- Wallet must have sufficient balance of the source token
+**User:** "Swap 1000 DEGEN to ETH with 2% slippage"
+
+**Agent Actions:**
+
+1.  Checks info.
+2.  **Agent**: "Confirming: You want to swap 1000 DEGEN to ETH with **2%** slippage. Is this correct?"
+3.  User confirms.
+4.  `npx fibx trade 1000 DEGEN ETH --slippage 2`
+
+### Swap on Monad
+
+**User:** "Buy USDC with 1 MON on Monad"
+
+**Agent Actions:**
+
+1.  `npx fibx status --chain monad`
+2.  `npx fibx trade 1 MON USDC --chain monad`
 
 ## Error Handling
 
-Common errors:
-
-- "Not authenticated" - Run `fibx auth login <email>` first
-- "No liquidity" - Try a smaller amount or different token pair
+- **"No route found"**: The trade path might not exist or liquidity is too low.
+- **"Insufficient balance"**: Check `balance` again.
+- **"Slippage exceeded"**: The price moved unfavorably; suggest retrying with higher slippage (after user confirmation).

@@ -10,6 +10,7 @@
 | [balance](./skills/balance/SKILL.md)                         | Check ETH and token balances on supported chains     |
 | [send](./skills/send/SKILL.md)                               | Send ETH or ERC-20 tokens to another address         |
 | [trade](./skills/trade/SKILL.md)                             | Swap/trade tokens using Fibrous aggregation          |
+| [tx-status](./skills/tx-status/SKILL.md)                     | Check transaction status and get explorer link       |
 
 ## Installation
 
@@ -41,6 +42,7 @@ Once installed, the agent will detect relevant user intents and invoke the appro
 - "Check my balance" -> Triggers `balance` skill
 - "Send 10 USDC to 0x123..." -> Triggers `send` skill
 - "Swap 0.05 ETH to USDC" -> Triggers `trade` skill
+- "Did my transaction go through?" -> Triggers `tx-status` skill
 
 ## License
 
