@@ -2,9 +2,9 @@
 name: aave
 description: Manage DeFi positions (Supply, Borrow, Repay, Withdraw) on Aave V3. Currently supports Base network only.
 license: MIT
-compatibility: Requires Node.js and npx. Works with fibx CLI v0.1.5+.
+compatibility: Requires Node.js and npx. Works with fibx CLI v0.2.1+.
 metadata:
-    version: 0.2.0
+    version: 0.2.1
     author: ahmetenesdur
     category: defi-management
 allowed-tools:

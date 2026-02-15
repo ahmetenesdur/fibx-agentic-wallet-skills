@@ -2,9 +2,9 @@
 name: send
 description: Send ETH or ERC-20 tokens to another address. Supports Base, Citrea, HyperEVM, and Monad.
 license: MIT
-compatibility: Requires Node.js and npx. Works with fibx CLI v0.1.2+.
+compatibility: Requires Node.js and npx. Works with fibx CLI v0.2.1+.
 metadata:
-    version: 0.2.0
+    version: 0.2.1
     author: ahmetenesdur
     category: transaction
 allowed-tools:

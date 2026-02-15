@@ -2,9 +2,9 @@
 name: balance
 description: Check wallet balances (ETH, USDC, etc.) on supported chains.
 license: MIT
-compatibility: Requires Node.js and npx. Works with fibx CLI v0.1.2+.
+compatibility: Requires Node.js and npx. Works with fibx CLI v0.2.1+.
 metadata:
-    version: 0.2.0
+    version: 0.2.1
     author: ahmetenesdur
     category: wallet-data
 allowed-tools:

@@ -2,9 +2,9 @@
 name: authenticate-wallet
 description: Sign in to the wallet using email OTP (Privy) or Import a Private Key. Required for all private wallet operations.
 license: MIT
-compatibility: Requires Node.js and npx. Works with fibx CLI v0.1.5+.
+compatibility: Requires Node.js and npx. Works with fibx CLI v0.2.1+.
 metadata:
-    version: 0.2.0
+    version: 0.2.1
     author: ahmetenesdur
     category: auth
 allowed-tools:
