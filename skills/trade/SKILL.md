@@ -1,98 +1,92 @@
 ---
 name: trade
-description: Swap/Trade tokens using Fibrous Finance aggregation. Supports Base, Citrea, HyperEVM, and Monad.
+description: Swap tokens using Fibrous Finance aggregation on Base, Citrea, HyperEVM, or Monad. Finds optimal route, simulates before execution.
 license: MIT
-compatibility: Requires Node.js and npx. Works with fibx CLI v0.2.6+.
+compatibility: Requires Node.js 18+ and npx. Works with fibx CLI v0.2.6+.
 metadata:
-    version: 0.2.6
+    version: 0.3.0
     author: ahmetenesdur
     category: transaction
 allowed-tools:
     - Bash(npx fibx@latest trade *)
     - Bash(npx fibx@latest status)
     - Bash(npx fibx@latest balance *)
+    - Bash(npx fibx@latest balance)
     - Bash(npx fibx@latest tx-status *)
 ---
 
 # Trade / Swap Tokens
 
-Exchange one token for another using the Fibrous Finance aggregator to find the best route.
+Exchange one token for another via Fibrous Finance aggregation. The CLI finds the best route, handles token approvals, simulates the swap, and executes.
 
-## Hard Rules (CRITICAL)
+## Prerequisites
 
-1.  **Pre-Flight Check**: Before ANY trade, you **MUST** run:
-    - `npx fibx@latest status`
-    - `npx fibx@latest balance` (ensure you have the _source_ token)
-2.  **Chain Specification**:
-    - If the user mentions a specific chain, you **MUST** include the `--chain <name>` parameter.
-    - If not mentioned, **MUST** clarify or default to **Base**.
-3.  **Slippage Safety**: The default slippage is **0.5%**. If you need to change this (e.g., for volatile tokens), you **MUST** ask the user for confirmation first.
-4.  **Approval Limits**: The CLI defaults to "Exact Approval". Do **NOT** use `--approve-max` unless explicitly requested.
-5.  **Simulation & Verification**: The CLI performs a **Swap Simulation** before asking for a signature. If the route is invalid or the transaction would revert, the CLI will error out early. Always verify success with `tx-status` after execution.
+- Active session required.
+- Sufficient balance of the source token + gas fees.
 
-## Input Schema
+## Rules
 
-The agent should extract the following parameters:
+1. BEFORE any trade, you MUST run `npx fibx@latest status` and `npx fibx@latest balance` to verify connectivity and source token balance.
+2. If the user specifies a chain, you MUST include `--chain <name>`. If not specified, default to `base` and state it.
+3. Default slippage is **0.5%**. To change it, you MUST ask the user for confirmation before using `--slippage`.
+4. The CLI defaults to **exact approval** for ERC-20 tokens. NEVER use `--approve-max` unless the user explicitly requests it.
+5. AFTER a successful trade, you MUST verify the transaction using `tx-status` with the same `--chain` flag.
 
-| Parameter    | Type   | Description                      | Required             |
-| :----------- | :----- | :------------------------------- | :------------------- |
-| `amount`     | number | Amount to swap (e.g., `1.5`)     | Yes                  |
-| `from_token` | string | Source token (e.g., `ETH`)       | Yes                  |
-| `to_token`   | string | Destination token (e.g., `USDC`) | Yes                  |
-| `chain`      | string | Network (`base`, `monad`, etc.)  | No (Default: `base`) |
-| `slippage`   | number | Slippage tolerance (e.g., `1.0`) | No (Default: `0.5`)  |
+## Chain Reference
 
-## Usage
+| Chain    | Flag               | Native Token |
+| -------- | ------------------ | ------------ |
+| Base     | `--chain base`     | ETH          |
+| Citrea   | `--chain citrea`   | cBTC         |
+| HyperEVM | `--chain hyperevm` | HYPE         |
+| Monad    | `--chain monad`    | MON          |
+
+## Commands
 
 ```bash
-npx fibx@latest trade <amount> <from_token> <to_token> [options]
+npx fibx@latest trade <amount> <from_token> <to_token> [--chain <chain>] [--slippage <n>] [--approve-max] [--json]
 ```
 
-## Options
+## Parameters
 
-| Option              | Description                                                      |
-| ------------------- | ---------------------------------------------------------------- |
-| `--chain <network>` | Network: `base`, `citrea`, `hyperevm`, `monad`. Default: `base`. |
-| `--slippage <n>`    | Slippage tolerance in percentage (e.g., `1.0`). Default `0.5`.   |
-| `--approve-max`     | Force infinite approval. **Use with caution.**                   |
-| `--json`            | Output result as JSON.                                           |
+| Parameter     | Type   | Description                              | Required |
+| ------------- | ------ | ---------------------------------------- | -------- |
+| `amount`      | number | Amount of source token to swap           | Yes      |
+| `from_token`  | string | Source token symbol (e.g. `ETH`, `USDC`) | Yes      |
+| `to_token`    | string | Target token symbol (e.g. `USDC`, `DAI`) | Yes      |
+| `chain`       | string | `base`, `citrea`, `hyperevm`, or `monad` | No       |
+| `slippage`    | number | Slippage tolerance in % (e.g. `1.0`)     | No       |
+| `approve-max` | flag   | Use infinite approval instead of exact   | No       |
+| `json`        | flag   | Output as JSON                           | No       |
+
+Default chain: `base`. Default slippage: `0.5`.
 
 ## Examples
 
-### Standard Swap (Base)
-
 **User:** "Swap 0.1 ETH for USDC"
 
-**Agent Actions:**
-
-1.  Check status/balance.
-2.  Trade:
-    ```bash
-    npx fibx@latest trade 0.1 ETH USDC
-    ```
-3.  Verify:
-    ```bash
-    npx fibx@latest tx-status <hash>
-    ```
-
-### Swap on Monad
+```bash
+npx fibx@latest status
+npx fibx@latest balance
+npx fibx@latest trade 0.1 ETH USDC
+npx fibx@latest tx-status <hash>
+```
 
 **User:** "Buy USDC with 1 MON on Monad"
 
-**Agent Actions:**
-
-1.  Check status/balance on Monad.
-2.  Trade:
-    ```bash
-    npx fibx@latest trade 1 MON USDC --chain monad
-    ```
-3.  Verify:
-    ```bash
-    npx fibx@latest tx-status <hash> --chain monad
-    ```
+```bash
+npx fibx@latest status
+npx fibx@latest balance --chain monad
+npx fibx@latest trade 1 MON USDC --chain monad
+npx fibx@latest tx-status <hash> --chain monad
+```
 
 ## Error Handling
 
-- **"No route found"**: The trade path might not exist or liquidity is too low.
-- **"Insufficient balance"**: Check `balance` again.
-- **"Slippage exceeded"**: Logic moved unfavorably; suggest retrying with higher slippage.
+| Error                  | Action                                                        |
+| ---------------------- | ------------------------------------------------------------- |
+| `No route found`       | Liquidity may be too low or pair doesn't exist on the chain.  |
+| `Insufficient balance` | Check `balance` and suggest a smaller amount.                 |
+| `Slippage exceeded`    | Price moved unfavorably — suggest retrying with `--slippage`. |
+| `Simulation failed`    | Route is invalid or would revert. Do not retry blindly.       |
+| `Not authenticated`    | Run `authenticate-wallet` skill first.                        |

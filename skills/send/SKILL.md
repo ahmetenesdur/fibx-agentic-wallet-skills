@@ -1,97 +1,92 @@
 ---
 name: send
-description: Send ETH or ERC-20 tokens to another address. Supports Base, Citrea, HyperEVM, and Monad.
+description: Send native tokens (ETH, cBTC, HYPE, MON) or ERC-20 tokens to an address on Base, Citrea, HyperEVM, or Monad. Simulates before sending.
 license: MIT
-compatibility: Requires Node.js and npx. Works with fibx CLI v0.2.6+.
+compatibility: Requires Node.js 18+ and npx. Works with fibx CLI v0.2.6+.
 metadata:
-    version: 0.2.6
+    version: 0.3.0
     author: ahmetenesdur
     category: transaction
 allowed-tools:
     - Bash(npx fibx@latest send *)
     - Bash(npx fibx@latest status)
     - Bash(npx fibx@latest balance *)
+    - Bash(npx fibx@latest balance)
     - Bash(npx fibx@latest tx-status *)
 ---
 
 # Send Transaction
 
-Transfer assets (native ETH/MON or ERC-20 tokens) to a destination address.
+Transfer native tokens or ERC-20 tokens to a destination address. The CLI automatically simulates the transaction before execution — if simulation fails, no funds are sent.
 
-## Hard Rules (CRITICAL)
+## Prerequisites
 
-1.  **Pre-Flight Check**: Before ANY send operation, you **MUST** run:
-    - `npx fibx@latest status` (to ensure connectivity)
-    - `npx fibx@latest balance` (to ensure sufficient funds)
-    - **Note**: The CLI automatically performs a **Simulation** before sending. If the simulation fails (e.g., due to insufficient funds or contract error), the CLI will exit with an error before asking for a signature.
-2.  **Recipient Confirmation**: If the user provides a recipient address that has **NOT** been mentioned in the current conversation history, you **MUST** ask for explicit confirmation before sending.
-    - _Agent_: "I am about to send 10 USDC to 0x123...456. Is this correct?"
-3.  **Chain Specification**:
-    - If the user mentions a specific chain, you **MUST** include the `--chain <name>` parameter.
-    - If not mentioned, **MUST** clarify or state default (Base).
-4.  **Native Token Naming**: The CLI supports native token symbols for each chain. You should use the correct symbol: `ETH` (Base), `MON` (Monad), `cBTC` (Citrea), `HYPE` (HyperEVM). Do **NOT** force `ETH` on non-Base chains.
-5.  **Post-Flight Verification**: You **MUST** use the `tx-status` skill to verify the transaction hash after sending.
+- Active session required.
+- Sufficient balance for the transfer amount + gas fees.
 
-## Input Schema
+## Rules
 
-The agent should extract the following parameters:
+1. BEFORE any send, you MUST run `npx fibx@latest status` and `npx fibx@latest balance` to verify connectivity and funds.
+2. If the recipient address was NOT previously mentioned in the conversation, you MUST ask for explicit confirmation: _"Sending [amount] [token] to [address]. Confirm?"_
+3. If the user specifies a chain, you MUST include `--chain <name>`. If not specified, default to `base` and state it.
+4. Use the correct native token symbol for each chain. NEVER use `ETH` on non-Base chains.
+5. AFTER a successful send, you MUST verify the transaction using `tx-status` with the same `--chain` flag.
 
-| Parameter   | Type   | Description                            | Required                   |
-| :---------- | :----- | :------------------------------------- | :------------------------- |
-| `amount`    | number | Amount to send (e.g., `0.1`, `100`)    | Yes                        |
-| `recipient` | string | Destination Ethereum address (`0x...`) | Yes                        |
-| `token`     | string | Token symbol (`ETH`, `MON`, `USDC`)    | No (Default: chain native) |
-| `chain`     | string | Network (`base`, `monad`, etc.)        | No (Default: `base`)       |
+## Chain Reference
 
-## Usage
+| Chain    | Flag               | Native Token |
+| -------- | ------------------ | ------------ |
+| Base     | `--chain base`     | ETH          |
+| Citrea   | `--chain citrea`   | cBTC         |
+| HyperEVM | `--chain hyperevm` | HYPE         |
+| Monad    | `--chain monad`    | MON          |
+
+## Commands
 
 ```bash
 npx fibx@latest send <amount> <recipient> [token] [--chain <chain>] [--json]
 ```
 
-## Options
+If `token` is omitted, the chain's native token is used.
 
-| Option              | Description                                                             |
-| ------------------- | ----------------------------------------------------------------------- |
-| `--chain <network>` | Network to use: `base`, `citrea`, `hyperevm`, `monad`. Default: `base`. |
-| `--json`            | Output result as JSON.                                                  |
+## Parameters
+
+| Parameter   | Type   | Description                              | Required |
+| ----------- | ------ | ---------------------------------------- | -------- |
+| `amount`    | number | Amount to send (e.g. `0.1`, `100`)       | Yes      |
+| `recipient` | string | Destination address (`0x...`)            | Yes      |
+| `token`     | string | Token symbol (e.g. `USDC`, `ETH`, `MON`) | No       |
+| `chain`     | string | `base`, `citrea`, `hyperevm`, or `monad` | No       |
+| `json`      | flag   | Output as JSON                           | No       |
+
+Default token: chain native. Default chain: `base`.
 
 ## Examples
 
-### Sending USDC
-
 **User:** "Send 10 USDC to 0x123...abc"
 
-**Agent Actions:**
-
-1.  Check auth & balance.
-2.  Confirm recipient.
-3.  Send:
-    ```bash
-    npx fibx@latest send 10 0x123...abc USDC
-    ```
-4.  Verify:
-    ```bash
-    npx fibx@latest tx-status <hash>
-    ```
-
-### Sending ETH on Monad
+```bash
+npx fibx@latest status
+npx fibx@latest balance
+# Confirm recipient with user
+npx fibx@latest send 10 0x123...abc USDC
+npx fibx@latest tx-status <hash>
+```
 
 **User:** "Send 0.05 MON to 0xdef...456 on Monad"
 
-**Agent Actions:**
-
-1.  Check status/balance on Monad.
-2.  Send:
-    ```bash
-    npx fibx@latest send 0.05 0xdef...456 MON --chain monad
-    ```
-3.  Verify on Monad:
-    ```bash
-    npx fibx@latest tx-status <hash> --chain monad
-    ```
+```bash
+npx fibx@latest status
+npx fibx@latest balance --chain monad
+npx fibx@latest send 0.05 0xdef...456 MON --chain monad
+npx fibx@latest tx-status <hash> --chain monad
+```
 
 ## Error Handling
 
-- **"Insufficient funds"**: Inform user of current balance.
-- **"Invalid address"**: Validate recipient format.
+| Error                | Action                                           |
+| -------------------- | ------------------------------------------------ |
+| `Insufficient funds` | Inform user of current balance via `balance`.    |
+| `Simulation failed`  | Transaction would revert — check amount and gas. |
+| `Invalid address`    | Validate recipient is a valid `0x` address.      |
+| `Not authenticated`  | Run `authenticate-wallet` skill first.           |

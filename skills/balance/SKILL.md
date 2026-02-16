@@ -1,70 +1,78 @@
 ---
 name: balance
-description: Check wallet balances (Native, ERC-20, etc.) on supported chains.
+description: Check wallet balances (native and ERC-20 tokens) on Base, Citrea, HyperEVM, or Monad.
 license: MIT
-compatibility: Requires Node.js and npx. Works with fibx CLI v0.2.6+.
+compatibility: Requires Node.js 18+ and npx. Works with fibx CLI v0.2.6+.
 metadata:
-    version: 0.2.6
+    version: 0.3.0
     author: ahmetenesdur
     category: wallet-data
 allowed-tools:
     - Bash(npx fibx@latest balance *)
+    - Bash(npx fibx@latest balance)
     - Bash(npx fibx@latest status)
 ---
 
 # Check Balance
 
-Inspect the wallet's holdings (native ETH/MON and ERC-20 tokens).
+Fetch wallet holdings: native tokens and all ERC-20 tokens with non-zero balances.
 
-## Hard Rules (CRITICAL)
+## Prerequisites
 
-1.  **Chain Specification**:
-    - If the user mentions a specific chain (e.g., "on Monad", "for my Citrea wallet"), you **MUST** include the `--chain <name>` parameter.
-    - If the user **DOES NOT** mention a chain, you **MUST** either:
-        - Explicitly state the default: "I will check your balance on **Base**. Is that correct?"
-        - OR ask for clarification: "Which chain would you like to check? Base, Citrea, HyperEVM, or Monad?"
+- Active session required. If not authenticated, run `authenticate-wallet` skill first.
 
-## Input Schema
+## Rules
 
-The agent should extract the following parameters:
+1. If the user specifies a chain, you MUST include `--chain <name>`.
+2. If the user does NOT specify a chain, default to `base` and state it: _"Checking your balance on Base."_
+3. Use `--json` when the output will be consumed by another skill or pipeline.
 
-| Parameter | Type   | Description                                              | Required             |
-| :-------- | :----- | :------------------------------------------------------- | :------------------- |
-| `chain`   | string | Network to check (`base`, `citrea`, `hyperevm`, `monad`) | No (Default: `base`) |
+## Chain Reference
 
-## Usage
+| Chain    | Flag               | Native Token |
+| -------- | ------------------ | ------------ |
+| Base     | `--chain base`     | ETH          |
+| Citrea   | `--chain citrea`   | cBTC         |
+| HyperEVM | `--chain hyperevm` | HYPE         |
+| Monad    | `--chain monad`    | MON          |
+
+## Commands
 
 ```bash
 npx fibx@latest balance [--chain <chain>] [--json]
 ```
 
-## Options
+## Parameters
 
-| Option              | Description                                                               |
-| ------------------- | ------------------------------------------------------------------------- |
-| `--chain <network>` | Network to check: `base`, `citrea`, `hyperevm`, `monad`. Default: `base`. |
-| `--json`            | Output results in JSON format.                                            |
+| Parameter | Type   | Description                              | Required |
+| --------- | ------ | ---------------------------------------- | -------- |
+| `chain`   | string | `base`, `citrea`, `hyperevm`, or `monad` | No       |
+| `json`    | flag   | Output as JSON                           | No       |
+
+Default chain: `base`
 
 ## Examples
 
-### Check Base Balance (Default)
+**User:** "Check my balance"
 
 ```bash
 npx fibx@latest balance
 ```
 
-### Check Monad Balance
+**User:** "What's my Monad balance?"
 
 ```bash
 npx fibx@latest balance --chain monad
 ```
 
-## Cross-Skill Integration
-
-- **Pre-Flight for `send` and `trade`**: Always check balance before sending or trading.
-- **Aave Collateral Check**: Use balance to confirm available assets before supplying to Aave.
-
 ## Error Handling
 
-- **"Not authenticated"**: Run `authenticate-wallet` skill.
-- **"Network error"**: Retry the command once.
+| Error               | Action                                 |
+| ------------------- | -------------------------------------- |
+| `Not authenticated` | Run `authenticate-wallet` skill first. |
+| `Network error`     | Retry the command once.                |
+
+## Related Skills
+
+- Run this BEFORE `send` or `trade` to verify sufficient funds.
+- Run this BEFORE `aave supply` to confirm available assets.

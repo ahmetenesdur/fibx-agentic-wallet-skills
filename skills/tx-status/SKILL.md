@@ -1,10 +1,10 @@
 ---
 name: tx-status
-description: Check transaction status, receipt details, and explorer link.
+description: Check the on-chain status of a transaction and get the block explorer link. Supports Base, Citrea, HyperEVM, and Monad.
 license: MIT
-compatibility: Requires Node.js and npx. Works with fibx CLI v0.2.6+.
+compatibility: Requires Node.js 18+ and npx. Works with fibx CLI v0.2.6+.
 metadata:
-    version: 0.2.6
+    version: 0.3.0
     author: ahmetenesdur
     category: utility
 allowed-tools:
@@ -13,69 +13,65 @@ allowed-tools:
 
 # Transaction Status
 
-Fetch on-chain data for a given transaction hash to verify success/failure.
+Fetch on-chain receipt data for a transaction hash: status, block number, gas used, and explorer link.
 
-## Hard Rules (CRITICAL)
+## Prerequisites
 
-1.  **Verification**: After performing a `send` or `trade`, use this skill if the user asks "did it go through?" or "show me the link".
-2.  **Chain Specificity**: If the transaction was on a specific chain (e.g., Monad), you **MUST** verify the status on that same chain using the `--chain` flag.
+- A valid transaction hash (starts with `0x`).
+- No authentication required — this is a public chain query.
 
-## Input Schema
+## Rules
 
-The agent should extract the following parameters:
+1. You MUST use the same `--chain` flag that was used for the original transaction. A Base tx hash will not be found on Monad.
+2. Use this skill AFTER every `send` or `trade` to verify success.
 
-| Parameter | Type   | Description                         | Required             |
-| :-------- | :----- | :---------------------------------- | :------------------- |
-| `hash`    | string | Transaction hash (starts with `0x`) | Yes                  |
-| `chain`   | string | Network (`base`, `monad`, etc.)     | No (Default: `base`) |
-
-## Usage
+## Commands
 
 ```bash
 npx fibx@latest tx-status <hash> [--chain <chain>] [--json]
 ```
 
-## Options
+## Parameters
 
-| Option              | Description                                                      |
-| ------------------- | ---------------------------------------------------------------- |
-| `--chain <network>` | Network: `base`, `citrea`, `hyperevm`, `monad`. Default: `base`. |
-| `--json`            | Output result as JSON.                                           |
+| Parameter | Type   | Description                              | Required |
+| --------- | ------ | ---------------------------------------- | -------- |
+| `hash`    | string | Transaction hash (`0x...`)               | Yes      |
+| `chain`   | string | `base`, `citrea`, `hyperevm`, or `monad` | No       |
+| `json`    | flag   | Output as JSON                           | No       |
+
+Default chain: `base`.
 
 ## Examples
 
-### Check Base Transaction
-
-**Input:** "Check status of 0x123...456"
+**User:** "Did my transaction go through?"
 
 ```bash
-npx fibx@latest tx-status 0x123...456
+npx fibx@latest tx-status 0x123...abc
 ```
 
-### Check Monad Transaction
-
-**Input:** "Verify tx 0xabc...def on Monad"
+**User:** "Check tx 0xabc...def on Monad"
 
 ```bash
 npx fibx@latest tx-status 0xabc...def --chain monad
 ```
 
-## JSON Output
+## JSON Output Structure
 
 ```json
 {
 	"status": "success",
 	"blockNumber": "12345",
 	"gasUsed": "21000",
-	"explorerLink": "https://..."
+	"from": "0x...",
+	"to": "0x...",
+	"explorerLink": "https://basescan.org/tx/0x...",
+	"chain": "base"
 }
 ```
 
-## Cross-Skill Integration
-
-- **Post-Flight for `send` and `trade`**: This skill is the verification step after any on-chain transaction. Always pass the same `--chain` flag used in the original command.
-
 ## Error Handling
 
-- **"Transaction not found"**: Ensure querying the correct chain.
-- **"Pending"**: TX might still be in mempool.
+| Error                   | Action                                                |
+| ----------------------- | ----------------------------------------------------- |
+| `Transaction not found` | Verify you are querying the correct chain.            |
+| `Pending`               | Transaction is still in the mempool — wait and retry. |

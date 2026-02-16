@@ -1,70 +1,60 @@
 # fibx Skills
 
-[Agent Skills](https://agentskills.io) for the `fibx` CLI wallet. These skills enable AI agents (Claude, GPT, etc.) to securely authenticate, check balances, send funds, and trade tokens on **Base, Citrea, HyperEVM, and Monad** using the [`fibx`](https://www.npmjs.com/package/fibx) CLI.
+[Agent Skills](https://agentskills.io) for the [`fibx`](https://www.npmjs.com/package/fibx) CLI. These skills enable AI agents to securely authenticate, check balances, send funds, trade tokens, and manage Aave V3 positions on **Base, Citrea, HyperEVM, and Monad**.
 
 ## Available Skills
 
-| Skill                                                        | Description                                                        | Category        |
-| ------------------------------------------------------------ | ------------------------------------------------------------------ | --------------- |
-| [authenticate-wallet](./skills/authenticate-wallet/SKILL.md) | Sign in via email OTP or Private Key Import                        | Auth            |
-| [aave](./skills/aave/SKILL.md)                               | Manage Aave V3 positions (Supply, Borrow, Repay, Withdraw) on Base | DeFi Management |
-| [balance](./skills/balance/SKILL.md)                         | Check native (ETH, MON, etc.) and token balances                   | Wallet Data     |
-| [send](./skills/send/SKILL.md)                               | Send ETH or ERC-20 tokens to another address                       | Transaction     |
-| [trade](./skills/trade/SKILL.md)                             | Swap/trade tokens using Fibrous aggregation                        | Transaction     |
-| [tx-status](./skills/tx-status/SKILL.md)                     | Check transaction status and get explorer link                     | Utility         |
+| Skill                                                        | Description                                       | Category |
+| ------------------------------------------------------------ | ------------------------------------------------- | -------- |
+| [authenticate-wallet](./skills/authenticate-wallet/SKILL.md) | Email OTP login, private key import, session mgmt | Auth     |
+| [balance](./skills/balance/SKILL.md)                         | Check native and ERC-20 token balances            | Wallet   |
+| [send](./skills/send/SKILL.md)                               | Send native or ERC-20 tokens to an address        | Tx       |
+| [trade](./skills/trade/SKILL.md)                             | Swap tokens via Fibrous Finance aggregation       | Tx       |
+| [aave](./skills/aave/SKILL.md)                               | Aave V3: supply, borrow, repay, withdraw (Base)   | DeFi     |
+| [tx-status](./skills/tx-status/SKILL.md)                     | Check transaction status and explorer link        | Utility  |
 
-## Installation
+## Getting Started
 
-To use these skills with an agent framework:
+1. Install `Node.js` (v18+) and `npm`.
+2. No installation of `fibx` is needed — all skills use `npx fibx@latest`.
+3. For email OTP authentication, a running [fibx-server](https://github.com/ahmetenesdur/fibx-server) instance is required.
+4. Import the skills from the `./skills` directory into your agent's skill registry.
 
-1.  **Dependencies**:
-    - `node` (v18+)
-    - `npm`
-    - No manual installation of `fibx` is required; skills use `npx fibx@latest`.
+## Supported Chains
 
-2.  **Add Skills**:
-    Import the skills from the `./skills` directory into your agent's skill registry.
+| Chain    | Native Token | Aave V3 |
+| -------- | ------------ | ------- |
+| Base     | ETH          | Yes     |
+| Citrea   | cBTC         | No      |
+| HyperEVM | HYPE         | No      |
+| Monad    | MON          | No      |
 
-## Configuration
+## Trigger Examples
 
-The skills require the following environment variables to be set in the agent's runtime environment:
+| User Prompt                       | Skill Triggered       |
+| --------------------------------- | --------------------- |
+| "Log me in with user@example.com" | `authenticate-wallet` |
+| "Import my private key"           | `authenticate-wallet` |
+| "Log me out"                      | `authenticate-wallet` |
+| "Check my balance"                | `balance`             |
+| "Send 10 USDC to 0x123..."        | `send`                |
+| "Swap 0.05 ETH to USDC"           | `trade`               |
+| "Supply 100 USDC to Aave"         | `aave`                |
+| "How is my Aave position?"        | `aave`                |
+| "Did my transaction go through?"  | `tx-status`           |
 
-```bash
-export PRIVY_APP_ID="your-app-id"
-export PRIVY_APP_SECRET="your-app-secret"
+## Typical Workflow
+
+```
+authenticate-wallet → balance → send/trade → tx-status
+                                  ↕
+                                aave
 ```
 
-> **Note:** Private key authentication is handled via the interactive `npx fibx@latest auth import` command — no `PRIVATE_KEY` environment variable is needed.
-
-## Examples
-
-### Common Triggers
-
-- "Log me in with user@example.com" → Triggers [`authenticate-wallet`](./skills/authenticate-wallet/SKILL.md)
-- "Log me out" → Triggers [`authenticate-wallet`](./skills/authenticate-wallet/SKILL.md)
-- "Import my private key" → Triggers [`authenticate-wallet`](./skills/authenticate-wallet/SKILL.md)
-- "Check my balance" → Triggers [`balance`](./skills/balance/SKILL.md)
-- "Send 10 USDC to 0x123..." → Triggers [`send`](./skills/send/SKILL.md)
-- "Send 1 MON to 0x456..." → Triggers [`send`](./skills/send/SKILL.md)
-- "Swap 0.05 ETH to USDC" → Triggers [`trade`](./skills/trade/SKILL.md)
-- "Supply 100 USDC to Aave" → Triggers [`aave`](./skills/aave/SKILL.md)
-- "Borrow 0.1 ETH from Aave" → Triggers [`aave`](./skills/aave/SKILL.md)
-- "Did my transaction go through?" → Triggers [`tx-status`](./skills/tx-status/SKILL.md)
-
-### Detailed Workflow: Token Swap
-
-**User:** "Swap 0.05 ETH to USDC on Base"
-
-**Agent Workflow:**
-
-1.  **Detection**: Agent matches request to `trade` skill.
-2.  **Validation**: Agent checks `Hard Rules` (Balances, Chain defaults).
-3.  **Execution**:
-    ```bash
-    npx fibx@latest trade 0.05 ETH USDC --chain base
-    ```
-    _(CLI automatically simulates the swap first)_
-4.  **Verification**: Agent uses `tx-status` to confirm success.
+1. **Authenticate** — `authenticate-wallet` (required first)
+2. **Check funds** — `balance`
+3. **Execute** — `send`, `trade`, or `aave`
+4. **Verify** — `tx-status`
 
 ## License
 

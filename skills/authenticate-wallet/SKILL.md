@@ -1,10 +1,10 @@
 ---
 name: authenticate-wallet
-description: Sign in to the wallet using email OTP (Privy) or Import a Private Key. Required for all private wallet operations.
+description: Authenticate the fibx CLI wallet via email OTP (Privy) or private key import. Required before any wallet operation (balance, send, trade, aave).
 license: MIT
-compatibility: Requires Node.js and npx. Works with fibx CLI v0.2.6+.
+compatibility: Requires Node.js 18+ and npx. Works with fibx CLI v0.2.6+.
 metadata:
-    version: 0.2.6
+    version: 0.3.0
     author: ahmetenesdur
     category: auth
 allowed-tools:
@@ -17,85 +17,88 @@ allowed-tools:
 
 # Wallet Authentication
 
-Manage the authentication session for the `fibx` CLI using a 2-step email OTP process.
+Manage the authentication session for the `fibx` CLI. Supports two methods: email OTP (via Privy server wallets) and private key import (local wallet).
 
-## Hard Rules (CRITICAL)
+## Prerequisites
 
-1.  **Safety First**:
-    - For **Email Login**: NEVER ask for private keys.
-    - For **Private Key Import**: WARN the user that the key will be stored locally. "I can import your private key, but please note it will be stored on your local machine. Shall I proceed?"
-2.  **Sequential Flow**: You MUST complete `auth login` (Step 1) before `auth verify` (Step 2).
-3.  **Verification**: After `auth verify` or `auth import`, ALWAYS run `npx fibx@latest status` to confirm the session is active.
+- `fibx-server` must be running (for email OTP method only)
+- No active session required — this skill creates one
 
-## Input Schema
+## Rules
 
-The agent should extract the following parameters:
+1. For email login, NEVER ask the user for a private key.
+2. For private key import, ALWAYS warn the user first: _"Your private key will be stored locally in an encrypted session file. Shall I proceed?"_
+3. You MUST complete `auth login` before `auth verify`. They are sequential steps.
+4. After successful `auth verify` or `auth import`, ALWAYS run `npx fibx@latest status` to confirm the session is active.
+5. NEVER store or log private keys, OTP codes, or session tokens in conversation history.
 
-| Parameter | Type   | Description                          | Required         |
-| :-------- | :----- | :----------------------------------- | :--------------- |
-| `email`   | string | User's email address                 | Yes              |
-| `otp`     | string | One-time password received via email | Yes (for verify) |
+## Commands
 
-## Usage
-
-### Step 1: Initiate Login (Email)
+### Email OTP Login (2-step)
 
 ```bash
+# Step 1: Send OTP to email
 npx fibx@latest auth login <email>
-```
 
-### Step 2: Verify OTP (Email)
-
-```bash
+# Step 2: Verify OTP code
 npx fibx@latest auth verify <email> <code>
 ```
 
-### Alternative: Import Private Key
+### Private Key Import
 
 ```bash
 npx fibx@latest auth import
 ```
 
-> **⚠️ INTERACTIVE COMMAND**: This command opens an interactive prompt. The agent **CANNOT** pass the private key as a CLI argument. You must instruct the user to run this command themselves in their terminal, or run it via the agent's terminal tool and let the user type the key into the prompt.
+> **INTERACTIVE COMMAND**: This opens a prompt for the user to paste their private key. The agent CANNOT pass the key as a CLI argument. Instruct the user to enter it in the terminal prompt, or run it via the agent's terminal tool and let the user type the key.
 
-_Note: The private key is stored locally in an encrypted session file._
-
-### Check Status
+### Session Management
 
 ```bash
+# Check current session status
+npx fibx@latest status
+
+# End session
+npx fibx@latest auth logout
+```
+
+## Parameters
+
+| Parameter | Type   | Description                          | Required          |
+| --------- | ------ | ------------------------------------ | ----------------- |
+| `email`   | string | User's email address                 | Yes (email OTP)   |
+| `code`    | string | One-time password received via email | Yes (verify step) |
+
+## Examples
+
+**User:** "Log me in with user@example.com"
+
+```bash
+npx fibx@latest auth login user@example.com
+# Wait for user to provide the OTP code (e.g. "123456")
+npx fibx@latest auth verify user@example.com 123456
 npx fibx@latest status
 ```
 
-### Logout
+**User:** "Import my private key"
+
+```bash
+# Warn user first, then:
+npx fibx@latest auth import
+npx fibx@latest status
+```
+
+**User:** "Log me out"
 
 ```bash
 npx fibx@latest auth logout
 ```
 
-## Examples
-
-### Full Login Flow
-
-**User:** "Log me in with user@example.com"
-
-**Agent Actions:**
-
-1.  Initiate login:
-    ```bash
-    npx fibx@latest auth login user@example.com
-    ```
-2.  (User provides code "123456")
-3.  Verify code:
-    ```bash
-    npx fibx@latest auth verify user@example.com 123456
-    ```
-4.  Confirm status:
-    ```bash
-    npx fibx@latest status
-    ```
-
 ## Error Handling
 
-- **"Invalid code"**: Ask the user to check the email and try `verify` again.
-- **"Rate limit"**: Wait for a few seconds before retrying.
-- **"Session expired"**: Restart the flow from Step 1.
+| Error               | Action                                                |
+| ------------------- | ----------------------------------------------------- |
+| `Invalid code`      | Ask the user to check their email and retry `verify`. |
+| `Rate limit`        | Wait 60 seconds before retrying.                      |
+| `Session expired`   | Restart from `auth login`.                            |
+| `Not authenticated` | Run the full login flow before other skills.          |
