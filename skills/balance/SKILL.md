@@ -2,9 +2,9 @@
 name: balance
 description: Check wallet balances (native and ERC-20 tokens) on Base, Citrea, HyperEVM, or Monad.
 license: MIT
-compatibility: Requires Node.js 18+ and npx. Works with fibx CLI v0.3.2+.
+compatibility: Requires Node.js 18+ and npx. Works with fibx CLI v0.3.3+.
 metadata:
-    version: 0.3.2
+    version: 0.3.3
     author: ahmetenesdur
     category: wallet-data
 allowed-tools:
