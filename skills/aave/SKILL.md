@@ -106,6 +106,7 @@ npx fibx@latest aave repay max ETH
 | `Insufficient collateral` | Cannot borrow without supplying first.                         |
 | `Insufficient balance`    | Check `balance` — user may need to swap for the token first.   |
 | `Not authenticated`       | Run `authenticate-wallet` skill first.                         |
+| `Rate limit / 429`        | Use `config` skill to set a custom RPC.                        |
 
 ## Related Skills
 

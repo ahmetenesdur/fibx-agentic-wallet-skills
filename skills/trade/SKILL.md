@@ -110,3 +110,4 @@ npx fibx@latest tx-status <hash> --chain monad
 | `Slippage exceeded`    | Price moved unfavorably — suggest retrying with `--slippage`. |
 | `Simulation failed`    | Route is invalid or would revert. Do not retry blindly.       |
 | `Not authenticated`    | Run `authenticate-wallet` skill first.                        |
+| `Rate limit / 429`     | Use `config` skill to set a custom RPC.                       |

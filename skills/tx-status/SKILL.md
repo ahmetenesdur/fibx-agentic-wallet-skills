@@ -75,3 +75,4 @@ npx fibx@latest tx-status 0xabc...def --chain monad
 | ----------------------- | ----------------------------------------------------- |
 | `Transaction not found` | Verify you are querying the correct chain.            |
 | `Pending`               | Transaction is still in the mempool — wait and retry. |
+| `Rate limit / 429`      | Use `config` skill to set a custom RPC.               |

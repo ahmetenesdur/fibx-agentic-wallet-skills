@@ -67,10 +67,11 @@ npx fibx@latest balance --chain monad
 
 ## Error Handling
 
-| Error               | Action                                 |
-| ------------------- | -------------------------------------- |
-| `Not authenticated` | Run `authenticate-wallet` skill first. |
-| `Network error`     | Retry the command once.                |
+| Error               | Action                                                     |
+| ------------------- | ---------------------------------------------------------- |
+| `Not authenticated` | Run `authenticate-wallet` skill first.                     |
+| `Network error`     | Retry once. If persistent, use `config` to set custom RPC. |
+| `Rate limit / 429`  | Use `config` skill to set a custom RPC.                    |
 
 ## Related Skills
 

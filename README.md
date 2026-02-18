@@ -12,6 +12,7 @@
 | [trade](./skills/trade/SKILL.md)                             | Swap tokens via Fibrous aggregation               | Tx       |
 | [aave](./skills/aave/SKILL.md)                               | Aave V3: supply, borrow, repay, withdraw (Base)   | DeFi     |
 | [tx-status](./skills/tx-status/SKILL.md)                     | Check transaction status and explorer link        | Utility  |
+| [config](./skills/config/SKILL.md)                           | Set custom RPC URLs to avoid rate limits          | Utility  |
 
 ## Installation
 
@@ -49,6 +50,7 @@ npx skills add Fibrous-Finance/fibx-skills
 | "Supply 1 ETH to Aave"            | `aave`                |
 | "Repay my ETH debt"               | `aave`                |
 | "Did my transaction go through?"  | `tx-status`           |
+| "I'm getting rate limited"        | `config`              |
 
 ## Typical Workflow
 

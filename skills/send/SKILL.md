@@ -90,3 +90,4 @@ npx fibx@latest tx-status <hash> --chain monad
 | `Simulation failed`  | Transaction would revert — check amount and gas. |
 | `Invalid address`    | Validate recipient is a valid `0x` address.      |
 | `Not authenticated`  | Run `authenticate-wallet` skill first.           |
+| `Rate limit / 429`   | Use `config` skill to set a custom RPC.          |
