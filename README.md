@@ -22,6 +22,12 @@ Install with [Vercel's Skills CLI](https://skills.sh):
 npx skills add Fibrous-Finance/fibx-skills
 ```
 
+Or clone directly into your project's skills directory:
+
+```bash
+git clone https://github.com/Fibrous-Finance/fibx-skills.git .skills/fibx-skills
+```
+
 ## Getting Started
 
 1. Install `Node.js` (v18+) and `npm`.
